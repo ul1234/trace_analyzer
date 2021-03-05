@@ -520,6 +520,7 @@ class Parser:
 
 class TraceAnalyzer:
     def __init__(self):
+        self.print_help()
         self.parser = Parser()
         self.pic = Pic()
         self.in_draw_line = False
@@ -530,11 +531,29 @@ class TraceAnalyzer:
         events = self.parser.parse(trace_file)
         #print('Parser Consuming: %.3fs' % (time.time() - profile_start_time))
         events.draw(self.pic)
+        
+    def print_help(self):
+        print('''
+*******************************************************************************
+* How to draw line:
+* 1. Press Ctrl or Shift or Alt Key and Click Left Button to Start to draw line.
+*    Ctrl Key: choose any point
+*    Shift Key: auto choose the left point of a block
+*    Alt Key: auto choose the right point of a block
+* 2. Click Left Button (or Press Shift or Alt Key and Click Left Button) to Finish, line saved.
+*    No Key pressed: choose any point
+*    Shift Key: auto choose the left point of a block
+*    Alt Key: auto choose the right point of a block
+* 3. Click Right Button to Finish, line canceled.
+* 4. Press Delete Key to remove the already drawed line.
+**********************************************************************************\n''')
+        
 
 class Key:
     pick_event_left_key = 'shift'
     pick_event_right_key = 'alt'
     pick_event_any_key = 'control'
+    delete_history_line_key = 'delete'
 
 class Pic:
     def __init__(self):
@@ -544,6 +563,7 @@ class Pic:
         self.current_event_rect = None
         self.line = None
         self.key_hold = {}
+        self.line_history = []
         for key in [Key.pick_event_left_key, Key.pick_event_right_key, Key.pick_event_any_key]:
             self.key_hold[key] = False
 
@@ -588,6 +608,8 @@ class Pic:
                 if button == 3:
                     self.line[0].remove()
                     self.line_text.remove()
+                else:
+                    self.line_history.append((self.line[0], self.line_text))
                 self.line = None
                 self.flush()
             self.in_draw_line = False
@@ -608,6 +630,15 @@ class Pic:
     def on_key_press(self, event):
         #print('press %s' % event.key)
         self.key_hold[event.key] = True
+        if event.key == Key.delete_history_line_key: self.backward_history_line()
+        
+    def backward_history_line(self):
+        if self.line_history:
+            line, line_text = self.line_history[-1]
+            del self.line_history[-1]
+            line.remove()
+            line_text.remove()
+            self.flush()
 
     def on_key_release(self, event):
         self.key_hold[event.key] = False
@@ -642,9 +673,9 @@ class Pic:
     def draw_rect(self, rect_region, color = 'b'):
         (x_start, x_end, y_start, y_end) = rect_region
         rect = patches.Rectangle((x_start, y_start), x_end - x_start, y_end - y_start, color = color)
-        self.ax.add_patch(rect)
+        self.ax.add_patch(rect)        
 
-VERSION = 'Trace Analyzer v0.2, 20210205'
+VERSION = 'Trace Analyzer v0.3, 20210305'
 
 if __name__ == '__main__':
     #test_trace_file = 'trace_1_server6_test.txt'
