@@ -113,6 +113,14 @@ class EventsConfig:
         _set_default_option('filter', '')
         return option
 
+    def _unique_trace_id_with_filter(self, trace_id, option_filter):
+        unique_trace_id = '%s__%s' % (trace_id, option_filter)   # change trace_id to make it unique if filter exists
+        if trace_id in self.trace_id_with_filters:
+            self.trace_id_with_filters[trace_id].append(unique_trace_id)
+        else:
+            self.trace_id_with_filters[trace_id] = [unique_trace_id]
+        return unique_trace_id
+                        
     def init_events_config(self):
         self.init_traces_format()
         self.events_config = {}
@@ -124,12 +132,13 @@ class EventsConfig:
                     option = self.get_option(option)
                     if not option['show']: continue
                     if option['filter']:
-                        unique_trace_id = '%s__%s' % (trace_id, option['filter'])   # change trace_id to make it unique if filter exists
-                        if trace_id in self.trace_id_with_filters:
-                            self.trace_id_with_filters[trace_id].append(unique_trace_id)
+                        if isinstance(trace_id, tuple):   # start_trace_id, end_trace_id
+                            start_trace_id, end_trace_id = trace_id
+                            # only end trace support filter (start trace do not support filter)
+                            end_trace_id = self._unique_trace_id_with_filter(end_trace_id, option['filter'])
+                            trace_id = (start_trace_id, end_trace_id)
                         else:
-                            self.trace_id_with_filters[trace_id] = [unique_trace_id]
-                        trace_id = unique_trace_id
+                            trace_id = self._unique_trace_id_with_filter(trace_id, option['filter'])
                     event_config.set_trace(trace_id, color, option)
                     trace_id_list = list(trace_id) if isinstance(trace_id, tuple) else [trace_id]
                     for id in trace_id_list:
@@ -675,7 +684,7 @@ class Pic:
         rect = patches.Rectangle((x_start, y_start), x_end - x_start, y_end - y_start, color = color)
         self.ax.add_patch(rect)        
 
-VERSION = 'Trace Analyzer v0.3, 20210305'
+VERSION = 'Trace Analyzer v0.4, 20210310'
 
 if __name__ == '__main__':
     #test_trace_file = 'trace_1_server6_test.txt'
