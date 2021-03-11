@@ -134,8 +134,9 @@ class EventsConfig:
                     if option['filter']:
                         if isinstance(trace_id, tuple):   # start_trace_id, end_trace_id
                             start_trace_id, end_trace_id = trace_id
-                            # only end trace support filter (start trace do not support filter)
-                            end_trace_id = self._unique_trace_id_with_filter(end_trace_id, option['filter'])
+                            start_trace_filter, end_trace_filter = option['filter']
+                            start_trace_id = self._unique_trace_id_with_filter(start_trace_id, start_trace_filter)
+                            end_trace_id = self._unique_trace_id_with_filter(end_trace_id, end_trace_filter)
                             trace_id = (start_trace_id, end_trace_id)
                         else:
                             trace_id = self._unique_trace_id_with_filter(trace_id, option['filter'])
@@ -213,8 +214,11 @@ class EventConfig:
         if not hasattr(self, 'option'): self.option = option  # the first trace option is the event option, 'rand_core_color', 'combine_core' is event option
         if isinstance(trace_id, tuple):
             start_trace_id, end_trace_id = trace_id
-            self._set_trace(start_trace_id, color, option, 'start')
-            self._set_trace(end_trace_id, color, option, 'end')
+            start_option, end_option = option.copy(), option.copy()
+            if 'filter' in option and option['filter']: # filter is tuple, (start trace filter, end trace filter)
+                start_option['filter'], end_option['filter'] = option['filter']
+            self._set_trace(start_trace_id, color, start_option, 'start')
+            self._set_trace(end_trace_id, color, end_option, 'end')
         else:
             self._set_trace(trace_id, color, option)
 
@@ -684,7 +688,7 @@ class Pic:
         rect = patches.Rectangle((x_start, y_start), x_end - x_start, y_end - y_start, color = color)
         self.ax.add_patch(rect)        
 
-VERSION = 'Trace Analyzer v0.5, 20210311'
+VERSION = 'Trace Analyzer v0.6, 20210311'
 
 if __name__ == '__main__':
     #test_trace_file = 'trace_1_server6_test.txt'

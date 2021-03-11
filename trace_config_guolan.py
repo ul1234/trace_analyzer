@@ -22,7 +22,7 @@
 # 'same_core': start trace and end trace can be on different cores or not, default: False
 # 'show': show this trace or not, default: True
 # 'xtick': show a xtick line with this trace, default: False
-# 'filter': only the trace id with the filtered content will be considered as this trace
+# 'filter': only the trace id with the filtered content will be considered as this trace, filter should be a tuple if there's start trace and end trace
 #
 # Notes:
 # 'combine_core' and 'rand_core_color' are applied to an event (trace groups), it should be set to the first trace of an event

@@ -22,7 +22,7 @@
 # 'same_core': start trace and end trace can be on different cores or not, default: False
 # 'show': show this trace or not, default: True
 # 'xtick': show a xtick line with this trace, default: False
-# 'filter': only the trace id with the filtered content will be considered as this trace
+# 'filter': only the trace id with the filtered content will be considered as this trace, filter should be a tuple if there's start trace and end trace
 #
 # Notes:
 # 'combine_core' and 'rand_core_color' are applied to an event (trace groups), it should be set to the first trace of an event
@@ -36,9 +36,10 @@ TRACES_CONFIG = {
     #             ],
     'DL SRP': [(10, 'DlSrp FFT', [(('NR_L0_DLSRP_DL_FFT_DATA_START', 'NR_L0_DLSRP_DL_FFT_DATA_END'), 'r', {})]),
                (11, 'DlSrp Pdcch', [(('NR_L0_DLSRP_PDCCH_START', 'NR_L0_DLSRP_PDCCH_END'), 'm', {})]),
+               (12, 'DlSrp Pdsch Task', [(('HLC_CONTEXT_SWITCH', 'HLC_CONTEXT_SWITCH'), 'b', {'filter': ('Prev Task: Idle, Next Task: NRL0DLSRP_PDSCH_H0I0T._NR', 'Prev Task: NRL0DLSRP_PDSCH_H0I0T._NR, Next Task: Idle')})]),
               ],
     'PDCCH': [(20, 'Pdcch Brp', [(('NR_L0_DLC_PDCCH_BRP_START', 'NR_L0_DLC_PDCCH_BRP_SD_END'), 'k', {'combine_core': True, 'xtick': True})]),
-              (21, 'Pdcch Copro', [(('NR_L0_DLC_COPRO_DECODE_START', 'NR_L0_DLC_COPRO_DECODE_END'), 'c', {'combine_core': True, 'same_core': False, 'filter': 'LastCoReSetCnf: True'})]),
+              (21, 'Pdcch Copro', [(('NR_L0_DLC_COPRO_DECODE_START', 'NR_L0_DLC_COPRO_DECODE_END'), 'c', {'combine_core': True, 'same_core': False, 'filter': ('','LastCoReSetCnf: True')})]),
               (22, 'Pdcch Copro Cnf', [(('NR_L0_DLC_COPRO_CNF_TASK_START', 'NR_L0_DLC_COPRO_CNF_TASK_END'), 'y', {})]),
               (23, 'Pdcch Sd Result', [(('NR_L0_DLC_SD_TASK_RSLT_START', 'NR_L0_DLC_SD_TASK_RSLT_END'), 'b', {}),
                                        ('FRAMEWORK_MSG_SEND', 'r', {'filter': 'NR_L0L1_PHY_DLC_UL_SCH_DATA_READY_IND'})]),
