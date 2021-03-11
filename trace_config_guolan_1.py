@@ -31,9 +31,9 @@
 ################################################################################################################################################################################################
 
 TRACES_CONFIG = {
-    'RADIO PROC': [(1, 'Offloading', [(('NR_L0_RADIO_PROC_OFFLOADING_START', 'NR_L0_RADIO_PROC_OFFLOADING_END'), 'b', {'show': False})]),
-                   (2, 'RadioProc', [(('NR_L0_RADIO_PROC_START', 'NR_L0_RADIO_PROC_END'), 'g', {})]),
-                  ],
+    #'RADIO PROC': [(1, 'Offloading', [(('NR_L0_RADIO_PROC_OFFLOADING_START', 'NR_L0_RADIO_PROC_OFFLOADING_END'), 'b', {'show': False})]),
+    #              (2, 'RadioProc', [(('NR_L0_RADIO_PROC_START', 'NR_L0_RADIO_PROC_END'), 'g', {})]),
+    #             ],
     'DL SRP': [(10, 'DlSrp FFT', [(('NR_L0_DLSRP_DL_FFT_DATA_START', 'NR_L0_DLSRP_DL_FFT_DATA_END'), 'r', {})]),
                (11, 'DlSrp Pdcch', [(('NR_L0_DLSRP_PDCCH_START', 'NR_L0_DLSRP_PDCCH_END'), 'm', {})]),
               ],
@@ -63,14 +63,20 @@ TRACES_CONFIG = {
                                  #('NR_L0_ULBRP_UCP_HARQ_REQ_MSG_SENT', 'y', {}),
                                  #('NR_L0_ULBRP_UCP_CSI_REQ_MSG_SENT', 'b', {}),
                                  #('NR_L0_ULBRP_SEND_MAP_PUSCH_DATA_MSG', 'r', {})]),
-                (51, 'PUCCH ENCODE ', [(('NR_L0_ULBRP_UCP_PUCCH_REQ_MSG_SENT', 'NR_L0_ULBRP_UCP_PUCCH_RSP_MSG_RECEIVED'), 'm', {}),
+                (51, 'PUCCH ENCODE', [(('NR_L0_ULBRP_UCP_PUCCH_REQ_MSG_SENT', 'NR_L0_ULBRP_UCP_PUCCH_RSP_MSG_RECEIVED'), 'm', {}),
                                  ('NR_L0_ULBRP_SEND_MAP_PUCCH_DATA_MSG', 'r', {})]), 
+                
+                (52, 'UL BRP message', [ ('NR_L0_ULBRP_ULC_CONFIG_MSG_RECEIVED', 'b', {'combine_core': True}),
+                                         ('NR_L0_ULBRP_MAC_PAYLOAD_MSG_RECEIVED', 'b', {}),
+                                         ('NR_L0_ULBRP_SEND_MAP_PUSCH_DATA_MSG', 'r', {}),
+                                         ('NR_L0_ULBRP_SEND_MAP_PUCCH_DATA_MSG', 'r', {})]),                                 
                ],
-    'UL SRP': [(60, 'UlSrp Mapping', [(('NR_L0_ULSRP_PUSCH_MAPPING_START', 'NR_L0_ULSRP_PUSCH_MAPPING_END'), 'c', {}),
-                                      (('NR_L0_ULSRP_PUCCH_MAPPING_START', 'NR_L0_ULSRP_PUCCH_MAPPING_END'), 'r', {}),
-                                      (('NR_L0_ULSRP_SRS_MAPPING_START', 'NR_L0_ULSRP_SRS_MAPPING_END'), 'g', {})]),
-               (61, 'UlSrp Tick', [(('NR_L0_ULSRP_TICK_HANDLING_START', 'NR_L0_ULSRP_TICK_HANDLING_END'), 'k', {}),
-                                   ('NR_L0_ULSRP_TIMING_SLOT', 'r', {})]),
-              ],
+               
+    #'UL SRP': [(60, 'UlSrp Mapping', [(('NR_L0_ULSRP_PUSCH_MAPPING_START', 'NR_L0_ULSRP_PUSCH_MAPPING_END'), 'c', {}),
+    #                                 (('NR_L0_ULSRP_PUCCH_MAPPING_START', 'NR_L0_ULSRP_PUCCH_MAPPING_END'), 'r', {}),
+    #                                  (('NR_L0_ULSRP_SRS_MAPPING_START', 'NR_L0_ULSRP_SRS_MAPPING_END'), 'g', {})]),
+    #           (61, 'UlSrp Tick', [(('NR_L0_ULSRP_TICK_HANDLING_START', 'NR_L0_ULSRP_TICK_HANDLING_END'), 'k', {}),
+    #                               ('NR_L0_ULSRP_TIMING_SLOT', 'r', {})]),
+    #          ],
               }
 

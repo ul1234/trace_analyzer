@@ -210,7 +210,7 @@ class EventConfig:
             self.traces_format[trace_id] = self._events_config.traces_format[trace_id]
 
     def set_trace(self, trace_id, color, option):
-        self.option = option
+        if not hasattr(self, 'option'): self.option = option  # the first trace option is the event option, 'rand_core_color', 'combine_core' is event option
         if isinstance(trace_id, tuple):
             start_trace_id, end_trace_id = trace_id
             self._set_trace(start_trace_id, color, option, 'start')
@@ -684,7 +684,7 @@ class Pic:
         rect = patches.Rectangle((x_start, y_start), x_end - x_start, y_end - y_start, color = color)
         self.ax.add_patch(rect)        
 
-VERSION = 'Trace Analyzer v0.4, 20210310'
+VERSION = 'Trace Analyzer v0.5, 20210311'
 
 if __name__ == '__main__':
     #test_trace_file = 'trace_1_server6_test.txt'

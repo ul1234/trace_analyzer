@@ -1,9 +1,35 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+################################################################################################################################################################################################
+#
+# TRACES_CONFIG:
+#
+# component: [(priority, event name, [((start_trace_id, end_trace_id), color, {'combine_core': True, 'rand_core_color': True, 'same_core': False, 'show': False, 'xtick': True, 'filter': '...'}),
+#                                      (trace_id, color, {options}),
+#                                      (trace_id, color, {options})]),
+#             (priority, event name, [...]),
+#             ]
+#
+# priority: the show order from top to bottom is the priority number from small to big
+#
 # color: 'k', 'grey', 'brown', 'darkred', 'r', 'orange', 'gold', 'y', 'yellowgreen', 'g', 'lime', springgreen', 'c', 'darkcyan',
-#       'skyblue', 'steelblue', 'navy', 'b', 'violet', 'purple', 'm', 'pink', 'deeppink'
-# component: [(priority, [(id, color, {'same_core': False, 'show': False, 'xtick': True}), ...]), ...]
+#        'skyblue', 'steelblue', 'navy', 'b', 'violet', 'purple', 'm', 'pink', 'deeppink'
+#
+# options:
+# 'combine_core': show different cores on the same line, default: False
+# 'rand_core_color': when different cores on the same line, show different cores traces with different random color, default: False
+# 'same_core': start trace and end trace can be on different cores or not, default: False
+# 'show': show this trace or not, default: True
+# 'xtick': show a xtick line with this trace, default: False
+# 'filter': only the trace id with the filtered content will be considered as this trace
+#
+# Notes:
+# 'combine_core' and 'rand_core_color' are applied to an event (trace groups), it should be set to the first trace of an event
+# other options are applied to each trace, it should be set to each trace
+#
+################################################################################################################################################################################################
+
 TRACES_CONFIG = {
     'DL SRP': [(10, 'DlSrp FFT', [(('NR_L0_DLSRP_DL_FFT_DATA_START', 'NR_L0_DLSRP_DL_FFT_DATA_END'), 'r', {'show': False})]),
                (11, 'DlSrp Pdcch', [(('NR_L0_DLSRP_PDCCH_START', 'NR_L0_DLSRP_PDCCH_END'), 'm', {'xtick': True})]),
