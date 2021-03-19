@@ -10,45 +10,6 @@ import matplotlib.patches as patches
 
 
 class DefaultConfig:
-    # color: 'k', 'grey', 'brown', 'darkred', 'r', 'orange', 'gold', 'y', 'yellowgreen', 'g', 'lime', springgreen', 'c', 'darkcyan',
-    #       'skyblue', 'steelblue', 'navy', 'b', 'violet', 'purple', 'm', 'pink', 'deeppink'
-    # component: [(priority, [(id, color, {'same_core': False, 'show': False, 'xtick': True}), ...]), ...]
-    TRACES_CONFIG = {
-        'RADIO PROC': [(1, 'Offloading', [(('NR_L0_RADIO_PROC_OFFLOADING_START', 'NR_L0_RADIO_PROC_OFFLOADING_END'), 'b', {'show': False})]),
-                       (2, 'RadioProc', [(('NR_L0_RADIO_PROC_START', 'NR_L0_RADIO_PROC_END'), 'g', {})]),
-                      ],
-        'DL SRP': [(10, 'DlSrp FFT', [(('NR_L0_DLSRP_DL_FFT_DATA_START', 'NR_L0_DLSRP_DL_FFT_DATA_END'), 'r', {})]),
-                   (11, 'DlSrp Pdcch', [(('NR_L0_DLSRP_PDCCH_START', 'NR_L0_DLSRP_PDCCH_END'), 'm', {'xtick': True})]),
-                  ],
-        'PDCCH': [(20, 'Pdcch Brp', [(('NR_L0_DLC_PDCCH_BRP_START', 'NR_L0_DLC_PDCCH_BRP_SD_END'), 'k', {})]),
-                  (21, 'Pdcch Copro', [(('NR_L0_DLC_COPRO_DECODE_START', 'NR_L0_DLC_COPRO_DECODE_END'), 'c', {'same_core': False})]),
-                  (22, 'Pdcch Copro Cnf', [(('NR_L0_DLC_COPRO_CNF_TASK_START', 'NR_L0_DLC_COPRO_CNF_TASK_END'), 'y', {})]),
-                  (23, 'Pdcch Sd Result', [(('NR_L0_DLC_SD_TASK_RSLT_START', 'NR_L0_DLC_SD_TASK_RSLT_END'), 'b', {}),
-                                           ('FRAMEWORK_MSG_SEND', 'r', {'filter': 'NR_L0L1_PHY_DLC_UL_SCH_DATA_READY_IND'})]),
-                 ],
-        'PDSCH BRP': [(30, 'Pdsch Copro', [(('NR_L0_PDSCHBRP_COPRO_START', 'NR_L0_PDSCHBRP_COPRO_END'), 'b', {'show': False})]),
-                      (31, 'Pdsch Copro Req', [(('NR_L0_PDSCHBRP_COPRO_REQ_START', 'NR_L0_PDSCHBRP_COPRO_REQ_END'), 'g', {})]),
-                      (32, 'Pdsch Copro Cnf', [(('NR_L0_PDSCHBRP_COPRO_CNF_START', 'NR_L0_PDSCHBRP_COPRO_CNF_END'), 'r', {'show': False})]),
-                      (33, 'Pdsch Post', [(('NR_L0_PDSCHBRP_POST_PROCESS_START', 'NR_L0_PDSCHBRP_POST_PROCESS_END'), 'm', {}),
-                                          ('NR_L0_PDSCHBRP_PHY_IND', 'r', {})]),
-                      (34, 'Pdsch Msg', [('NR_L0_PDSCHBRP_PHY_IND_CRC_RESULTS', 'k', {'show': False})]),
-                      (35, 'HARQ Msg', [('FRAMEWORK_MSG_SEND', 'r', {'filter': 'NR_L0_ULC_DLC_SEND_HARQ_IND'})]),
-                     ],
-        'UL CTRL': [(40, 'UlCtrl Tti', [(('NR_L0_ULC_SCHEDULE_TTI_START', 'NR_L0_ULC_SCHEDULE_TTI_END'), 'c', {})]),
-                   ],
-        'UL BRP':  [(50, 'UCP Msg', [('NR_L0_ULBRP_UCP_REQ_MSG_SENT', 'm', {}),
-                                     ('NR_L0_ULBRP_UCP_HARQ_REQ_MSG_SENT', 'y', {}),
-                                     ('NR_L0_ULBRP_UCP_CSI_REQ_MSG_SENT', 'b', {})]),
-                    (51, 'PUCCH Data', [('NR_L0_ULBRP_SEND_MAP_PUCCH_DATA_MSG', 'r', {})]),
-                   ],
-        'UL SRP': [(60, 'UlSrp Mapping', [(('NR_L0_ULSRP_PUSCH_MAPPING_START', 'NR_L0_ULSRP_PUSCH_MAPPING_END'), 'c', {}),
-                                          (('NR_L0_ULSRP_PUCCH_MAPPING_START', 'NR_L0_ULSRP_PUCCH_MAPPING_END'), 'r', {}),
-                                          (('NR_L0_ULSRP_SRS_MAPPING_START', 'NR_L0_ULSRP_SRS_MAPPING_END'), 'g', {})]),
-                   (61, 'UlSrp Tick', [(('NR_L0_ULSRP_TICK_HANDLING_START', 'NR_L0_ULSRP_TICK_HANDLING_END'), 'k', {}),
-                                       ('NR_L0_ULSRP_TIMING_SLOT', 'r', {})]),
-                  ],
-                  }
-
     TRACES_FORMAT = {
         'NR_L0_RADIO_PROC_OFFLOADING_START': (['RadioStreamIdx', 'Lst'], ['ant', 'start_lst']),
         'NR_L0_RADIO_PROC_OFFLOADING_END': (['BClk'], ['bclk']),
@@ -87,9 +48,9 @@ class DefaultConfig:
         }
 
 class EventsConfig:
-    def __init__(self, config = None):
-        if config is None: config = DefaultConfig
-        self.traces_config = config.TRACES_CONFIG if hasattr(config, 'TRACES_CONFIG') else DefaultConfig.TRACES_CONFIG
+    def __init__(self, config):
+        assert hasattr(config, 'TRACES_CONFIG'), 'no TRACES_CONFIG in trace config file!'
+        self.traces_config = config.TRACES_CONFIG
         self.traces_format = config.TRACES_FORMAT if hasattr(config, 'TRACES_FORMAT') else DefaultConfig.TRACES_FORMAT
         self.init_events_config()
 
@@ -120,7 +81,7 @@ class EventsConfig:
         else:
             self.trace_id_with_filters[trace_id] = [unique_trace_id]
         return unique_trace_id
-                        
+
     def init_events_config(self):
         self.init_traces_format()
         self.events_config = {}
@@ -277,7 +238,6 @@ class Trace:
         return same_event
 
     def __str__(self):
-        #s = '[%s] HLC %d.%d, %.2fus: %s%s\n' % (self.event_config.component, self.server, self.core, self.time, self.id, self.params_text)
         return '%s\n' % self.raw_text
 
 class Event:
@@ -412,7 +372,7 @@ class Events:
                     if event.finish_flag: self.event_list_pending_index.remove(index)
                     return True
             if trace.type == 'end':
-                print('Warning: Trace Id cannot be added! %s.' % trace.raw_text)
+                print('Warning: Trace Id cannot be added! Cannot find Start trace for this End trace.\n%s.\n' % trace.raw_text)
                 return False
             event = Event(trace, self.rand_color_dict)
             if not event.finish_flag: self.event_list_pending_index.append(len(self.event_list))
@@ -544,23 +504,10 @@ class TraceAnalyzer:
         events = self.parser.parse(trace_file)
         #print('Parser Consuming: %.3fs' % (time.time() - profile_start_time))
         events.draw(self.pic)
-        
+
     def print_help(self):
-        print('''
-*******************************************************************************
-* How to draw line:
-* 1. Press Ctrl or Shift or Alt Key and Click Left Button to Start to draw line.
-*    Ctrl Key: choose any point
-*    Shift Key: auto choose the left point of a block
-*    Alt Key: auto choose the right point of a block
-* 2. Click Left Button (or Press Shift or Alt Key and Click Left Button) to Finish, line saved.
-*    No Key pressed: choose any point
-*    Shift Key: auto choose the left point of a block
-*    Alt Key: auto choose the right point of a block
-* 3. Click Right Button to Finish, line canceled.
-* 4. Press Delete Key to remove the already drawed line.
-**********************************************************************************\n''')
-        
+        print('[%s]\n' % VERSION)
+
 
 class Key:
     pick_event_left_key = 'shift'
@@ -644,7 +591,7 @@ class Pic:
         #print('press %s' % event.key)
         self.key_hold[event.key] = True
         if event.key == Key.delete_history_line_key: self.backward_history_line()
-        
+
     def backward_history_line(self):
         if self.line_history:
             line, line_text = self.line_history[-1]
@@ -686,20 +633,22 @@ class Pic:
     def draw_rect(self, rect_region, color = 'b'):
         (x_start, x_end, y_start, y_end) = rect_region
         rect = patches.Rectangle((x_start, y_start), x_end - x_start, y_end - y_start, color = color)
-        self.ax.add_patch(rect)        
+        self.ax.add_patch(rect)
 
-VERSION = 'Trace Analyzer v0.6, 20210311'
+VERSION = 'Trace Analyzer v0.7, 20210319'
 
 if __name__ == '__main__':
-    #test_trace_file = 'trace_1_server6_test.txt'
-    #test_trace_file = 'trace_1_server6.txt'
-    test_trace_file = 'trace_1.txt'
-    trace_file = sys.argv[1] if len(sys.argv) > 1 else test_trace_file
-    config_file = sys.argv[2] if len(sys.argv) > 2 else ''
-    trace_config = None
-    if config_file and os.path.isfile(config_file):
-        trace_config = __import__(os.path.splitext(os.path.basename(config_file))[0])
-    g_events_config = EventsConfig(trace_config)
-    trace_analyzer = TraceAnalyzer()
-    trace_analyzer.draw(trace_file)
+    if len(sys.argv) <= 2:
+        print('Usage: python trace_analyzer.py trace_file.txt trace_config.py')
+    else:
+        trace_file, config_file = sys.argv[1], sys.argv[2]
+        if not os.path.isfile(trace_file):
+            print('File "%s" not found!' % trace_file)
+        elif not os.path.isfile(config_file):
+            print('File "%s" not found!' % config_file)
+        else:
+            trace_config = __import__(os.path.splitext(os.path.basename(config_file))[0])
+            g_events_config = EventsConfig(trace_config)
+            trace_analyzer = TraceAnalyzer()
+            trace_analyzer.draw(trace_file)
 
