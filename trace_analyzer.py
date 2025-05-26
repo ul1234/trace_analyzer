@@ -15,8 +15,8 @@ class DefaultConfig:
         'NR_L0_RADIO_PROC_OFFLOADING_END': (['BClk'], ['bclk']),
         'NR_L0_RADIO_PROC_START': (['RadioStreamIdx', 'Lst'], ['ant', 'start_lst']),
         'NR_L0_RADIO_PROC_END': (['RadioStreamIdx', 'Lst'], ['ant', 'end_lst']),
-        'NR_L0_DLSRP_DL_FFT_DATA_START': (['Hwi', 'RadioStreamIdx', 'Lst'], ['hwi', 'ant', 'start_lst']),
-        'NR_L0_DLSRP_DL_FFT_DATA_END': (['Hwi', 'RadioStreamIdx', 'Lst'], ['hwi', 'ant', 'start_lst']),
+        'NR_L0_DLSRP_DL_FFT_DATA_START': (['Hwi', 'RadioStreamIdx'], ['hwi', 'ant']),
+        'NR_L0_DLSRP_DL_FFT_DATA_END': (['Hwi', 'RadioStreamIdx'], ['hwi', 'ant']),
         'NR_L0_DLSRP_PDCCH_START': (['Sfn', 'Subframe', 'Slot', 'Symbol', 'Hwi', 'TaskIndex'], ['sfn', 'subframe', 'slot', 'symbol', 'hwi', 'task_index']),
         'NR_L0_DLSRP_PDCCH_END': (['Sfn', 'Subframe', 'Slot', 'Symbol', 'Hwi', 'TaskIndex'], ['sfn', 'subframe', 'slot', 'symbol', 'hwi', 'task_index']),
         'NR_L0_DLC_PDCCH_BRP_START': (['Sfn', 'SubframeNum', 'SlotNum'], ['sfn', 'subframe', 'slot']),
@@ -219,7 +219,7 @@ class Trace:
         self.trace_config = self.event_config.traces[id]
         self.type = self.trace_config.type
         if self.type == 'info':
-            self.time_range = (time, time + 2)
+            self.time_range = (time, time + 0.5)  # single trace (no start/end), duration 0.5us
         else:
             self.time_range = (time, time)  # 'start' or 'end'
 
@@ -259,20 +259,23 @@ class Event:
         self.retain_event_time_text = False
         self.set_rand_color(rand_color_dict, trace.trace_config.color)
 
+    def set_index(self, event_idx):
+        self.event_idx = event_idx
+
     def set_rand_color(self, rand_color_dict, trace_color):
         if self.event_config.option['rand_core_color']:
             if not self.event_config.priority in rand_color_dict:
                 rand_color_dict[self.event_config.priority] = {}
             key = (self.server, self.core)
             if key in rand_color_dict[self.event_config.priority]:
-                self.color = rand_color_dict[self.event_config.priority][key]
+                self.rand_color = rand_color_dict[self.event_config.priority][key]
             elif not rand_color_dict[self.event_config.priority]:
                 rand_color_dict[self.event_config.priority][key] = trace_color
-                self.color = trace_color
+                self.rand_color = trace_color
             else:
-                color = EventsConfig.get_rand_color(rand_color_dict[self.event_config.priority].values())
-                rand_color_dict[self.event_config.priority][key] = color
-                self.color = color
+                rand_color = EventsConfig.get_rand_color(rand_color_dict[self.event_config.priority].values())
+                rand_color_dict[self.event_config.priority][key] = rand_color
+                self.rand_color = rand_color
 
     def try_add_trace(self, trace):
         if self.finish_flag: return False
@@ -319,12 +322,20 @@ class Event:
         self.pic = pic
         if hasattr(self, 'start_trace'):
             rect_region = (self.time_range[0], self.time_range[1], self.total_lines - self.line_index - 1, self.total_lines - self.line_index)
-            color = self.color if hasattr(self, 'color') else self.start_trace.trace_config.color
+            if hasattr(self, 'rand_color'):
+                color = self.rand_color
+            elif isinstance(self.start_trace.trace_config.color, list):
+                color = self.start_trace.trace_config.color[self.event_idx % len(self.start_trace.trace_config.color)]
+            else:
+                color = self.start_trace.trace_config.color
             pic.draw_rect(rect_region, color)
         for trace in self.info_traces:
             rect_region = (trace.time_range[0], trace.time_range[1], self.total_lines - self.line_index - 1, self.total_lines - self.line_index)
-            #color = self.color if hasattr(self, 'color') else trace.trace_config.color
-            color = trace.trace_config.color
+            #color = self.rand_color if hasattr(self, 'rand_color') else trace.trace_config.color
+            if isinstance(trace.trace_config.color, list):
+                color = trace.trace_config.color[self.event_idx % len(trace.trace_config.color)]
+            else:
+                color = trace.trace_config.color
             pic.draw_rect(rect_region, color)
 
     def is_in_rect_region(self, x, y):
@@ -393,8 +404,10 @@ class Events:
                 key = (event.event_config.priority, event.server, event.core)
             if key in self.group:
                 self.group[key].append(event)
+                event.set_index(len(self.group[key]) - 1)   # the current event index in the group
             else:
                 self.group[key] = [event]
+                event.set_index(0)
             self.draw_event_list.append(event)
         #pprint.pprint(self.group)
         sorted_keys = sorted(self.group.keys())
@@ -413,14 +426,15 @@ class Events:
                     elif self.xticks_server == event.server:
                         self.xticks += event.xticks
                 event_name = event.event_config.name
-            self.yticks_label.append('%s(%s.%s)' % (event_name, key[1], key[2]))   # trace_id(server.core)
+            self.yticks_label.append('[%s] %s(%s.%s)' % (event.event_config.component, event_name, key[1], key[2]))   # trace_id(server.core)
 
-    def printevents(self):
+    def print_events(self):
         for i, event in enumerate(self.event_list):
             print('Event %d:\n%s\n' % (i, str(event)))
 
     def draw(self, pic):
         pic.set_events(self)
+        print('Draw lines: %d' % self.total_lines)
         pic.init_axes(self.time_range[0], self.time_range[1], 0, self.total_lines)
         for event in self.draw_event_list:
             event.draw(pic)
@@ -446,7 +460,7 @@ class Events:
 
 class Parser:
     def __init__(self):
-        self.parser_re = re.compile(r'\s*(-[\d\.]+) \[LTE:HLC (\d):(\d+)\.(\d+)\] (\w+)(.*)$')
+        self.parser_re = re.compile(r'\s*(-[\d\.]+) \[LTE:HLC (\d):(\d+)\.(\d+)\s*\] (\w+)(.*)$')
         self.events = Events()
 
     def parse(self, filename):
@@ -635,11 +649,18 @@ class Pic:
         rect = patches.Rectangle((x_start, y_start), x_end - x_start, y_end - y_start, color = color)
         self.ax.add_patch(rect)
 
-VERSION = 'Trace Analyzer v0.7, 20210319'
+VERSION = 'Trace Analyzer v0.8, 20250527'
 
 if __name__ == '__main__':
     if len(sys.argv) <= 2:
         print('Usage: python trace_analyzer.py trace_file.txt trace_config.py')
+
+        trace_file = 'trace_pdcch_copro_1.txt'
+        config_file = 'trace_config_pdcch_copro.py'
+        trace_config = __import__(os.path.splitext(os.path.basename(config_file))[0])
+        g_events_config = EventsConfig(trace_config)
+        trace_analyzer = TraceAnalyzer()
+        trace_analyzer.draw(trace_file)
     else:
         trace_file, config_file = sys.argv[1], sys.argv[2]
         if not os.path.isfile(trace_file):

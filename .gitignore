@@ -2,3 +2,7 @@
 *.ini
 trace
 temp
+.vscode
+.idea
+.venv
+__pycache__
