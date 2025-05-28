@@ -18,4 +18,5 @@ python trace_analyzer.py trace_1.txt trace_config_example.py
 3) Click Right Button to Finish, line canceled.
 4) Press Delete Key to remove the last drawed line.
 
+3. When the mouse moves inside a block, the time duration is showed above the block. Double click to fix the time show. Another double click to unfix it. When the mouse moves outside the block, the time show disappears.
 

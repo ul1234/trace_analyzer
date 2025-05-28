@@ -460,7 +460,7 @@ class Events:
 
 class Parser:
     def __init__(self):
-        self.parser_re = re.compile(r'\s*(-[\d\.]+) \[LTE:HLC (\d):(\d+)\.(\d+)\s*\] (\w+)(.*)$')
+        self.parser_re = re.compile(r'\s*(-?[\d\.]+) \[LTE:HLC (\d):(\d+)\.(\d+)\s*\] (\w+)(.*)$')
         self.events = Events()
 
     def parse(self, filename):
